@@ -180,67 +180,52 @@ public class SoundFiltersMod {
 
 		config.save();
 
-		for (String occlusionInfo : occlusionBlocksList) {
-			Block block = null;
-			String blockName = "";
-			int meta = -1;
-			double strength = -1;
-
-			try {
-				int lastDashIndex = occlusionInfo.lastIndexOf('-');
-				int firstDashIndex = occlusionInfo.substring(0, lastDashIndex).lastIndexOf('-');
-				blockName = occlusionInfo.substring(0, firstDashIndex);
-				String metaStr = occlusionInfo.substring(firstDashIndex + 1, lastDashIndex);
-				if ("*".equals(metaStr)) {
-					meta = -1;//(future) magical value for all
-				} else {
-					meta = Integer.parseInt(metaStr);
-				}
-				strength = Double.parseDouble(occlusionInfo.substring(lastDashIndex + 1));
-				block = Block.getBlockFromName(blockName);
-			} catch (Exception e) {
-				logger.error("Error while loading in custom occlusion entry!" + (blockName == "" ? "" : " Block ID was " + blockName), e);
-			}
-
-			if (block != null && meta >= 0 && strength >= 0) {
-				if (DEBUG)
-					logger.debug("Loaded custom occlusion: block " + blockName + ", with " + (meta == 16 ? "any meta" : "meta " + meta) + ", and amount " + strength);
-				customOcclusion.put(new BlockMeta(block, meta), strength);
-			}
-
-		}
-
-		for (String reverbInfo : reverbBlocksList) {
-			Block block = null;
-			String blockName = "";
-			int meta = -1;
-			double strength = -1;
-
-			try {
-				int lastDashIndex = reverbInfo.lastIndexOf('-');
-				int firstDashIndex = reverbInfo.substring(0, lastDashIndex).lastIndexOf('-');
-				blockName = reverbInfo.substring(0, firstDashIndex);
-				String metaStr = reverbInfo.substring(firstDashIndex + 1, lastDashIndex);
-				if ("*".equals(metaStr)) {
-					meta = -1;//(future) magical value for all
-				} else {
-					meta = Integer.parseInt(metaStr);
-				}
-				strength = Double.parseDouble(reverbInfo.substring(lastDashIndex + 1));
-				block = Block.getBlockFromName(blockName);
-			} catch (Exception e) {
-				logger.error("Error while loading in custom reverb entry!" + (blockName == "" ? "" : " Block ID was " + blockName), e);
-			}
-
-			if (block != null && meta >= 0 && strength >= 0) {
-				if (DEBUG)
-					logger.debug("Loaded custom reverb: block " + blockName + ", with " + (meta == 16 ? "any meta" : "meta " + meta) + ", and amount " + strength);
-				customReverb.put(new BlockMeta(block, meta), strength);
-			}
-		}
+		parseCustomBlockList(occlusionBlocksList, customOcclusion, "occlusion");
+		parseCustomBlockList(reverbBlocksList, customReverb, "reverb");
 
 		proxy.registerTickHandlers();
 		proxy.registerEventHandlers();
+	}
+
+	private void parseCustomBlockList(String[] blocksList, TreeMap<BlockMeta,Double> customMap, String logName) {
+		for (String customInfo : blocksList) {
+			Block block = null;
+			String blockName = "";
+			int meta = -1;
+			double strength = -1;
+	
+			try {
+				int lastDashIndex = customInfo.lastIndexOf('-');
+				int secondLastDashIndex = customInfo.lastIndexOf('-', lastDashIndex - 1);
+				blockName = customInfo.substring(0, secondLastDashIndex);
+				if (customInfo.startsWith("*-", secondLastDashIndex + 1)) {
+					meta = -1;//(future) magical value for all
+					logger.error("star " + logName + " is not yet supported");
+					throw new NumberFormatException("star " + logName + " is not yet supported");
+				} else {
+					String metaStr = customInfo.substring(secondLastDashIndex + 1, lastDashIndex);
+					meta = Integer.parseInt(metaStr);
+					if (meta < 0) {
+						throw new NumberFormatException("only non negative values are permitted");
+					}
+				}
+				strength = Double.parseDouble(customInfo.substring(lastDashIndex + 1));
+				block = Block.getBlockFromName(blockName);
+			} catch (Exception e) {
+				logger.error("Error while loading in custom " + logName + " entry: '" + customInfo + "'", e);
+			}
+			//meta value can only be negative in two cases:
+			// 1: star value used
+			// 2: failure during assignments
+			// in the first case this is ok, in the second case strength/block is also still invalid
+			if (block != null && meta >= 0 /*TODO remove meta check */&& strength >= 0) {
+				if (DEBUG) {
+					logger.debug("Loaded custom " + logName + ": block " + blockName + ", with " 
+						+ (meta == -1 ? "any meta" : "meta " + meta) + ", and amount " + strength);
+				}
+				customMap.put(new BlockMeta(block, meta), strength);
+			}
+		}
 	}
 
 	@EventHandler
