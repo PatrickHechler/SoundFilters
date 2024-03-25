@@ -187,7 +187,11 @@ public class SoundFiltersMod {
 		proxy.registerEventHandlers();
 	}
 
-	private void parseCustomBlockList(String[] blocksList, TreeMap<BlockMeta,Double> customMap, String logName) {
+	private void parseCustomBlockList(String[] blocksList, TreeMap<BlockMeta,Double> customMap, String name) {
+//		String[] occlusionBlocksList = config.getStringList("Specific block occlusion:", "occlusion", new String[] { "wool-16-2.0" },
+		boolean legacyAnyMeta = config.getBoolean("Old Meta 16 Value", "debug", false, 
+			"if set to true the special meta value * will be invalid and\n"
+			+ "the meta value 16 will instead be converted to any meta");
 		for (String customInfo : blocksList) {
 			Block block = null;
 			String blockName = "";
@@ -198,21 +202,30 @@ public class SoundFiltersMod {
 				int lastDashIndex = customInfo.lastIndexOf('-');
 				int secondLastDashIndex = customInfo.lastIndexOf('-', lastDashIndex - 1);
 				blockName = customInfo.substring(0, secondLastDashIndex);
-				if (customInfo.startsWith("*-", secondLastDashIndex + 1)) {
-					meta = -1;//(future) magical value for all
-					logger.error("star " + logName + " is not yet supported");
-					throw new NumberFormatException("star " + logName + " is not yet supported");
-				} else {
-					String metaStr = customInfo.substring(secondLastDashIndex + 1, lastDashIndex);
+				String metaStr = customInfo.substring(lastDashIndex + 1, secondLastDashIndex);
+				if (legacyAnyMeta) {
 					meta = Integer.parseInt(metaStr);
-					if (meta < 0) {
-						throw new NumberFormatException("only non negative values are permitted");
+					if (meta == 16) {
+						meta = -1;
+					} else if (meta < 0) {
+						throw new NumberFormatException("only non-negative values are permitted");
+					}
+				} else {
+					if (customInfo.startsWith("*-", secondLastDashIndex + 1)) {
+						meta = -1;//(future) magical value for all
+						logger.error("star " + name + " is not yet supported");
+						throw new NumberFormatException("star " + name + " is not yet supported");
+					} else {
+						meta = Integer.parseInt(metaStr);
+						if (meta < 0) {
+							throw new NumberFormatException("only non-negative values are permitted");
+						}
 					}
 				}
 				strength = Double.parseDouble(customInfo.substring(lastDashIndex + 1));
 				block = Block.getBlockFromName(blockName);
 			} catch (Exception e) {
-				logger.error("Error while loading in custom " + logName + " entry: '" + customInfo + "'", e);
+				logger.error("Error while loading in custom " + name + " entry: '" + customInfo + "'", e);
 			}
 			//meta value can only be negative in two cases:
 			// 1: star value used
@@ -220,14 +233,14 @@ public class SoundFiltersMod {
 			// in the first case this is ok, in the second case strength/block is also still invalid
 			if (block != null && meta >= 0 /*TODO remove meta check */&& strength >= 0) {
 				if (DEBUG) {
-					logger.debug("Loaded custom " + logName + ": block " + blockName + ", with " 
+					logger.debug("Loaded custom " + name + ": block " + blockName + ", with " 
 						+ (meta == -1 ? "any meta" : "meta " + meta) + ", and amount " + strength);
 				}
 				customMap.put(new BlockMeta(block, meta), strength);
 			}
 		}
 	}
-
+	
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		reverbFilter.density = 0.0F;
