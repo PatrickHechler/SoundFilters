@@ -1,32 +1,27 @@
 package com.tmtravlr.soundfilters;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 
 import com.tmtravlr.soundfilters.SoundFiltersMod.BlockMeta;
 
-import paulscode.sound.Source;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import paulscode.sound.Source;
 
 /**
  * This class handles the tick events and updates the filter parameters for each
@@ -48,14 +43,7 @@ public class SoundTickHandler {
 	public static boolean waterSound = false;
 	public static boolean lavaSound = false;
 
-	// Comparator for the ComparablePositions
-	public static Comparator<ComparablePosition> CPcomparator = new Comparator<ComparablePosition>() {
-		public int compare(SoundTickHandler.ComparablePosition first, SoundTickHandler.ComparablePosition second) {
-			return first.compareTo(second);
-		}
-	};
-
-	public static ConcurrentSkipListMap<ComparablePosition, DoubleWithTimeout> sourceOcclusionMap = new ConcurrentSkipListMap(CPcomparator);
+	public static ConcurrentSkipListMap<ComparablePosition, DoubleWithTimeout> sourceOcclusionMap = new ConcurrentSkipListMap<>();
 
 	/**
 	 * Represents a x, y, z position which has a comparator and a few methods
@@ -65,7 +53,7 @@ public class SoundTickHandler {
 	 * @author Rebeca Rey
 	 * @Date 2014
 	 */
-	public static class ComparablePosition implements Comparable {
+	public static class ComparablePosition implements Comparable<ComparablePosition> {
 		float x;
 		float y;
 		float z;
@@ -91,6 +79,7 @@ public class SoundTickHandler {
 			return MathHelper.floor(z);
 		}
 
+		@Override
 		public boolean equals(Object object) {
 			if (!(object instanceof ComparablePosition)) {
 				return false;
@@ -100,12 +89,8 @@ public class SoundTickHandler {
 			return toCompare.compareTo(this) == 0;
 		}
 
-		public int compareTo(Object object) {
-			if (!(object instanceof ComparablePosition)) {
-				return 0;
-			}
-			ComparablePosition toCompare = (ComparablePosition) object;
-
+		@Override
+		public int compareTo(ComparablePosition toCompare) {
 			if (toCompare.x - this.x > 0.1) {
 				return 1;
 			} else if (toCompare.x - this.x < -0.1) {
@@ -162,7 +147,7 @@ public class SoundTickHandler {
 				if (this.mc.player.isInsideOfMaterial(Material.WATER)) {
 					if (!waterSound) {
 						if (SoundFiltersMod.DEBUG) {
-							SoundFiltersMod.logger.debug("[SoundFilters] Applying water sound low pass.");
+							SoundFiltersMod.logger.info("[SoundFilters] Applying water sound low pass.");
 						}
 
 						targetLowPassGain = SoundFiltersMod.waterVolume;
@@ -172,7 +157,7 @@ public class SoundTickHandler {
 					}
 				} else if (waterSound) {
 					if (SoundFiltersMod.DEBUG) {
-						SoundFiltersMod.logger.debug("[SoundFilters] Stopping water sound low pass.");
+						SoundFiltersMod.logger.info("[SoundFilters] Stopping water sound low pass.");
 					}
 
 					targetLowPassGain = 1.0F;
@@ -183,7 +168,7 @@ public class SoundTickHandler {
 				if (this.mc.player.isInsideOfMaterial(Material.LAVA)) {
 					if (!lavaSound) {
 						if (SoundFiltersMod.DEBUG) {
-							SoundFiltersMod.logger.debug("[SoundFilters] Applying lava sound low pass.");
+							SoundFiltersMod.logger.info("[SoundFilters] Applying lava sound low pass.");
 						}
 
 						targetLowPassGain = SoundFiltersMod.lavaVolume;
@@ -193,7 +178,7 @@ public class SoundTickHandler {
 					}
 				} else if (lavaSound) {
 					if (SoundFiltersMod.DEBUG) {
-						SoundFiltersMod.logger.debug("[SoundFilters] Stopping lava sound low pass.");
+						SoundFiltersMod.logger.info("[SoundFilters] Stopping lava sound low pass.");
 					}
 
 					targetLowPassGain = 1.0F;
@@ -250,7 +235,7 @@ public class SoundTickHandler {
 
 				for (ComparablePosition positionToRemove : toRemove) {
 					if (SoundFiltersMod.SUPER_DUPER_DEBUG)
-						SoundFiltersMod.logger.debug("[Sound Filters] Removing " + positionToRemove + ", " + positionToRemove.hashCode() + ", " + profileTickCountdown);
+						SoundFiltersMod.logger.info("[Sound Filters] Removing " + positionToRemove + ", " + positionToRemove.hashCode() + ", " + profileTickCountdown);
 					sourceOcclusionMap.remove(positionToRemove);
 				}
 			}
@@ -264,12 +249,11 @@ public class SoundTickHandler {
 					profileTickCountdown = 13;
 
 					Random rand = new Random();
-					TreeSet<ComparablePosition> visited = new TreeSet<ComparablePosition>(CPcomparator);
+					TreeSet<ComparablePosition> visited = new TreeSet<ComparablePosition>();
 					ArrayList<IBlockState> blocksFound = new ArrayList<IBlockState>();
 
 					LinkedList<ComparablePosition> toVisit = new LinkedList<ComparablePosition>();
 					toVisit.add(new ComparablePosition(MathHelper.floor(this.mc.player.posX), MathHelper.floor(this.mc.player.posY), MathHelper.floor(this.mc.player.posZ)));
-					Block block;
 					IBlockState state;
 
 					// Flood fill through the area the player is in, with
@@ -286,7 +270,6 @@ public class SoundTickHandler {
 						// South
 						ComparablePosition pos = new ComparablePosition(current.x, current.y, current.z + 1);
 						state = this.mc.world.getBlockState(new BlockPos(pos.x(), pos.y(), pos.z()));
-						block = state.getBlock();
 						Material material = state.getMaterial();
 
 						if (!material.blocksMovement()) {
@@ -304,7 +287,6 @@ public class SoundTickHandler {
 						// North
 						pos = new ComparablePosition(current.x, current.y, current.z - 1);
 						state = this.mc.world.getBlockState(new BlockPos(pos.x(), pos.y(), pos.z()));
-						block = state.getBlock();
 						material = state.getMaterial();
 
 						if (!material.blocksMovement()) {
@@ -322,7 +304,6 @@ public class SoundTickHandler {
 						// Up
 						pos = new ComparablePosition(current.x, current.y + 1, current.z);
 						state = this.mc.world.getBlockState(new BlockPos(pos.x(), pos.y(), pos.z()));
-						block = state.getBlock();
 						material = state.getMaterial();
 
 						if (!material.blocksMovement()) {
@@ -340,7 +321,6 @@ public class SoundTickHandler {
 						// Down
 						pos = new ComparablePosition(current.x, current.y - 1, current.z);
 						state = this.mc.world.getBlockState(new BlockPos(pos.x(), pos.y(), pos.z()));
-						block = state.getBlock();
 						material = state.getMaterial();
 
 						if (!material.blocksMovement()) {
@@ -358,7 +338,6 @@ public class SoundTickHandler {
 						// East
 						pos = new ComparablePosition(current.x + 1, current.y, current.z);
 						state = this.mc.world.getBlockState(new BlockPos(pos.x(), pos.y(), pos.z()));
-						block = state.getBlock();
 						material = state.getMaterial();
 
 						if (!material.blocksMovement()) {
@@ -376,7 +355,6 @@ public class SoundTickHandler {
 						// West
 						pos = new ComparablePosition(current.x - 1, current.y, current.z);
 						state = this.mc.world.getBlockState(new BlockPos(pos.x(), pos.y(), pos.z()));
-						block = state.getBlock();
 						material = state.getMaterial();
 
 						if (!material.blocksMovement()) {
@@ -405,14 +383,10 @@ public class SoundTickHandler {
 						Block b = s.getBlock();
 
 						// Check for custom reverb blocks
-						BlockMeta blockInfo = new BlockMeta(b, SoundFiltersMod.ALL_METAS);
+						Double value = getCustomValue(b, b.getMetaFromState(s), SoundFiltersMod.customOcclusion);
 
-						if (!SoundFiltersMod.customReverb.containsKey(blockInfo)) {
-							blockInfo = new BlockMeta(b, b.getMetaFromState(s));
-						}
-
-						if (SoundFiltersMod.customReverb.containsKey(blockInfo)) {
-							double factor = SoundFiltersMod.customReverb.get(blockInfo);
+						if (value != null) {
+							double factor = value.doubleValue();
 
 							lowReverb += factor >= 1.0 || factor < 0.0 ? 0.0 : 1.0 - factor;
 							midReverb += factor >= 2.0 || factor <= 0.0 ? 0.0 : 1.0 - Math.abs(factor - 1.0);
@@ -513,7 +487,7 @@ public class SoundTickHandler {
 					}
 
 					if (SoundFiltersMod.SUPER_DUPER_DEBUG) {
-						SoundFiltersMod.logger.debug("[Sound Filters] Reverb Profile - Room Size: " + roomSize + ", Looked at: " + i + ", Sky Factor: " + skyFactor + ", High, Mid, and Low Reverb: ("
+						SoundFiltersMod.logger.info("[Sound Filters] Reverb Profile - Room Size: " + roomSize + ", Looked at: " + i + ", Sky Factor: " + skyFactor + ", High, Mid, and Low Reverb: ("
 								+ highReverb + ", " + midReverb + ", " + lowReverb + ")");
 					}
 
@@ -543,7 +517,6 @@ public class SoundTickHandler {
 	private static boolean onlySkyAboveBlock(World world, int x, int y, int z) {
 		for (int i = y; i < 256; i++) {
 			IBlockState state = world.getBlockState(new BlockPos(x, i, z));
-			Block block = state.getBlock();
 
 			if (state.getMaterial().blocksMovement()) {
 				return false;
@@ -704,14 +677,7 @@ public class SoundTickHandler {
 
 						if (rayTrace != null) {
 							// Check for custom occlusion blocks
-							BlockMeta blockInfo = new BlockMeta(block, meta);
-
-							Double value = SoundFiltersMod.customOcclusion.get(blockInfo);
-
-							if (value == null) {
-								blockInfo = new BlockMeta(block, SoundFiltersMod.ALL_METAS);
-								value = SoundFiltersMod.customOcclusion.get(blockInfo);
-							}
+							Double value = getCustomValue(block, meta, SoundFiltersMod.customOcclusion);
 
 							if (value != null) {
 								occludedPercent += value.doubleValue() * 0.1D;
@@ -733,5 +699,16 @@ public class SoundTickHandler {
 		} else {
 			return occludedPercent;
 		}
+	}
+
+	private static Double getCustomValue(Block block, int meta, Map<BlockMeta,Double> customMap) {
+		BlockMeta blockInfo = new BlockMeta(block, meta);
+		Double value = customMap.get(blockInfo);
+
+		if (value == null) {
+			blockInfo = new BlockMeta(block, SoundFiltersMod.ALL_METAS);
+			value = customMap.get(blockInfo);
+		}
+		return value;
 	}
 }
