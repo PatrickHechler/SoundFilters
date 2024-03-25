@@ -1,14 +1,10 @@
 package com.tmtravlr.soundfilters;
 
-import java.util.Map;
-
 import com.tmtravlr.soundfilters.SoundTickHandler.ComparablePosition;
 import com.tmtravlr.soundfilters.SoundTickHandler.DoubleWithTimeout;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.ISound.AttenuationType;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
