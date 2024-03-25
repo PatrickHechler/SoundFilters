@@ -1,9 +1,7 @@
 package com.tmtravlr.soundfilters;
 
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 import org.apache.logging.log4j.Logger;
 
@@ -42,8 +40,6 @@ public class SoundFiltersMod {
 	public static CommonProxy proxy;
 
 	public static Logger logger;
-
-	private static Random rand = new Random();
 
 	public static int profileSize = 1024;
 	public static boolean doSkyChecks = true;
@@ -229,7 +225,7 @@ public class SoundFiltersMod {
 			prop.set(reverbBlocksList);
 		}
 
-		if (DEBUG && logger.isDebugEnabled()) {
+		if (DEBUG) {
 			logger.debug("customOcclusion: " + customOcclusion);
 			logger.debug("customReverb: " + customReverb);
 		}
