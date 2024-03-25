@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 /**
  * This class handles the tick events and updates the filter parameters for each
  * source playing.
- * 
+ *
  * @author Rebeca Rey
  * @Date 2014
  */
@@ -61,7 +61,7 @@ public class SoundTickHandler {
 	 * Represents a x, y, z position which has a comparator and a few methods
 	 * that make comparing it with another ComparablePositions very fast. Used
 	 * for fast-access sets/maps.
-	 * 
+	 *
 	 * @author Rebeca Rey
 	 * @Date 2014
 	 */
@@ -134,7 +134,7 @@ public class SoundTickHandler {
 	 * occlusion amount. Also has a timeout variables, which the source should
 	 * be constantly setting to 10. When the source stops setting it to 10, the
 	 * sound is assumed to have finished playing.
-	 * 
+	 *
 	 * @author Rebeca Rey
 	 * @Date 2014
 	 */
@@ -158,7 +158,7 @@ public class SoundTickHandler {
 	public void tick(TickEvent.ClientTickEvent event) {
 		if (event.phase == TickEvent.Phase.START) {
 			if (this.mc != null && this.mc.world != null && this.mc.player != null && !this.mc.isGamePaused()) {
-				// Handle the low-pass inside of liquids				
+				// Handle the low-pass inside of liquids
 				if (this.mc.player.isInsideOfMaterial(Material.WATER)) {
 					if (!waterSound) {
 						if (SoundFiltersMod.DEBUG) {
@@ -200,11 +200,11 @@ public class SoundTickHandler {
 					targetLowPassGainHF = 1.0F;
 					lavaSound = false;
 				}
-				
+
 				if (Math.abs(targetLowPassGain - baseLowPassGain) > 0.001F) {
 					baseLowPassGain = (targetLowPassGain + baseLowPassGain) / 2;
 				}
-				
+
 				if (Math.abs(targetLowPassGainHF - baseLowPassGainHF) > 0.001F) {
 					baseLowPassGainHF = (targetLowPassGainHF + baseLowPassGainHF) / 2;
 				}
@@ -228,7 +228,7 @@ public class SoundTickHandler {
 					DoubleWithTimeout sourceAndAmount = (DoubleWithTimeout) sourceOcclusionMap.get(sourcePosition);
 					if (sourceAndAmount != null) {
 						if (sourceAndAmount.source != null && sourceAndAmount.source.position != null && sourceAndAmount.source.active()) {
-							
+
 							// The source can sometimes be modified in another thread, causing a rare null pointer exception here. It seems to happen when a lot of mods are installed.
 							try {
 								if (this.mc != null && this.mc.world != null && this.mc.player != null) {
@@ -444,13 +444,13 @@ public class SoundTickHandler {
 						/*
 						 * Check if you and blocks around you can see the sky in
 						 * a pattern like so:
-						 * 
+						 *
 						 * B B B
-						 * 
+						 *
 						 * B P B
-						 * 
+						 *
 						 * B B B
-						 * 
+						 *
 						 * With distances of random from 5 to 10, and also above
 						 * 5 for the B's
 						 */
@@ -558,7 +558,7 @@ public class SoundTickHandler {
 	 * amount of occlusion the sound should have. Note that it ignores the block
 	 * which the sound plays from inside (so sounds playing from inside blocks
 	 * don't sound occluded).
-	 * 
+	 *
 	 * @param world
 	 *            The world
 	 * @param sound
@@ -704,14 +704,17 @@ public class SoundTickHandler {
 
 						if (rayTrace != null) {
 							// Check for custom occlusion blocks
-							BlockMeta blockInfo = new BlockMeta(block, SoundFiltersMod.ALL_METAS);
+							BlockMeta blockInfo = new BlockMeta(block, meta);
 
-							if (!SoundFiltersMod.customOcclusion.containsKey(blockInfo)) {
-								blockInfo = new BlockMeta(block, meta);
+							Double value = SoundFiltersMod.customOcclusion.get(blockInfo);
+
+							if (value == null) {
+								blockInfo = new BlockMeta(block, SoundFiltersMod.ALL_METAS);
+								value = SoundFiltersMod.customOcclusion.get(blockInfo);
 							}
 
-							if (SoundFiltersMod.customOcclusion.containsKey(blockInfo)) {
-								occludedPercent += SoundFiltersMod.customOcclusion.get(blockInfo) * 0.1D;
+							if (value != null) {
+								occludedPercent += value.doubleValue() * 0.1D;
 							} else if (occludedPercent < 0.7D) {
 								occludedPercent += material.isOpaque() ? 0.1D : 0.05D;
 							}
