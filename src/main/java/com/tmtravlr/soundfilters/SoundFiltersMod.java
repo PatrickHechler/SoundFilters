@@ -72,6 +72,9 @@ public class SoundFiltersMod {
 		}
 	};
 
+	public static final int ALL_METAS = 16;
+	private static final String ALL_METAS_STR = "16";
+	
 	public static TreeMap<BlockMeta, Double> customOcclusion = new TreeMap<BlockMeta, Double>(BlockComparator);
 	public static TreeMap<BlockMeta, Double> customReverb = new TreeMap<BlockMeta, Double>(BlockComparator);
 
@@ -145,14 +148,14 @@ public class SoundFiltersMod {
 				"The percentage of occlusion you can get. You can lower this if you find\n"
 				+ "the occlusion to be too much or raise it for a more noticeable\n"
 				+ "effect.");
-		String[] occlusionBlocksList = config.getStringList("Specific block occlusion:", "occlusion", new String[] { "wool-16-2.0" },
+		String[] occlusionBlocksList = config.getStringList("Specific block occlusion:", "occlusion", new String[] { "wool-" + ALL_METAS_STR + "-2.0" },
 				"Add new entries (each on a new line) in the format\n"
 				+ "<block id>-<metadata>-<occlusion double> to customize how much sound\n"
 				+ "they should absorb when they are between you and the sound source.\n"
-				+ "For the metadata, 16 means any metadata value. The amount is a\n"
+				+ "For the metadata, " + ALL_METAS_STR + " means any metadata value. The amount is a\n"
 				+ "double, with 0.0 absorbing no sound (like air), and 1.0 being the normal\n"
 				+ "amount, and 2.0 being twice the normal amount. By default, wool has\n"
-				+ "entry wool-16-2.0 which is twice the normal sound absorbtion.");
+				+ "entry wool-" + ALL_METAS_STR + "-2.0 which is twice the normal sound absorbtion.");
 
 		doReverb = config.getBoolean("Use Reverb?", "reverb", true, "Set to false to disable reverb.");
 		reverbPercent = config.getFloat("Reverb Percent", "reverb", 1.0f, 0.0f, 2.0f, 
@@ -167,16 +170,16 @@ public class SoundFiltersMod {
 				+ "there will be less reverb. This is for aboveground areas with\n"
 				+ "lots of stone and such like extreme hills biomes. There still might\n"
 				+ "be some, but less then when the sky isn't visible.");
-		String[] reverbBlocksList = config.getStringList("Specific block reverb:", "reverb", new String[] { "soul_sand-16-2.0" },
+		String[] reverbBlocksList = config.getStringList("Specific block reverb:", "reverb", new String[] { "soul_sand-" + ALL_METAS_STR + "-2.0" },
 				"Add values to this list (each on a new line) in the format \n"
 				+ "<block id>-<metadata>-<reverb double>, to change how the block\n"
 				+ "with that metadata absorbs or creates reverb. If the\n"
-				+ "metadata is 16, that means it will apply to any metadata value.\n"
+				+ "metadata is " + ALL_METAS_STR + ", that means it will apply to any metadata value.\n"
 				+ "By default things like wool, snow, carpets, and plants absorb reverb\n"
 				+ "(value 0.0), things like wood and dirt are neutral (value 1.0),\n"
 				+ "and things like stone, metal, ice, and glass create reverb (value 2.0).\n"
 				+ "So if, say, you wanted to add pumpkins of any metadata to the blocks\n"
-				+ "that create reverb, you would put pumpkin-16-2.0 on a new line.");
+				+ "that create reverb, you would put pumpkin-" + ALL_METAS_STR + "-2.0 on a new line.");
 
 		config.save();
 
@@ -188,8 +191,7 @@ public class SoundFiltersMod {
 	}
 
 	private void parseCustomBlockList(String[] blocksList, TreeMap<BlockMeta,Double> customMap, String name) {
-//		String[] occlusionBlocksList = config.getStringList("Specific block occlusion:", "occlusion", new String[] { "wool-16-2.0" },
-		boolean legacyAnyMeta = config.getBoolean("Old Meta 16 Value", "debug", false, 
+		boolean legacyAnyMeta = config.getBoolean("Legacy Meta 16 Value", "debug", false, 
 			"if set to true the special meta value * will be invalid and\n"
 			+ "the meta value 16 will instead be converted to any meta");
 		for (String customInfo : blocksList) {
@@ -206,20 +208,18 @@ public class SoundFiltersMod {
 				if (legacyAnyMeta) {
 					meta = Integer.parseInt(metaStr);
 					if (meta == 16) {
-						meta = -1;
+						meta = ALL_METAS;
 					} else if (meta < 0) {
 						throw new NumberFormatException("only non-negative values are permitted");
 					}
+				} else if (customInfo.startsWith("*-", secondLastDashIndex + 1)) {
+					meta = ALL_METAS;
+					logger.error("star " + name + " is not yet supported");
+					throw new NumberFormatException("star " + name + " is not yet supported");
 				} else {
-					if (customInfo.startsWith("*-", secondLastDashIndex + 1)) {
-						meta = -1;//(future) magical value for all
-						logger.error("star " + name + " is not yet supported");
-						throw new NumberFormatException("star " + name + " is not yet supported");
-					} else {
-						meta = Integer.parseInt(metaStr);
-						if (meta < 0) {
-							throw new NumberFormatException("only non-negative values are permitted");
-						}
+					meta = Integer.parseInt(metaStr);
+					if (meta < 0) {
+						throw new NumberFormatException("only non-negative values are permitted");
 					}
 				}
 				strength = Double.parseDouble(customInfo.substring(lastDashIndex + 1));
@@ -234,7 +234,7 @@ public class SoundFiltersMod {
 			if (block != null && meta >= 0 /*TODO remove meta check */&& strength >= 0) {
 				if (DEBUG) {
 					logger.debug("Loaded custom " + name + ": block " + blockName + ", with " 
-						+ (meta == -1 ? "any meta" : "meta " + meta) + ", and amount " + strength);
+						+ (meta == ALL_METAS ? "any meta" : "meta " + meta) + ", and amount " + strength);
 				}
 				customMap.put(new BlockMeta(block, meta), strength);
 			}

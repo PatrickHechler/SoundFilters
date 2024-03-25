@@ -405,7 +405,7 @@ public class SoundTickHandler {
 						Block b = s.getBlock();
 
 						// Check for custom reverb blocks
-						BlockMeta blockInfo = new BlockMeta(b, 16);
+						BlockMeta blockInfo = new BlockMeta(b, SoundFiltersMod.ALL_METAS);
 
 						if (!SoundFiltersMod.customReverb.containsKey(blockInfo)) {
 							blockInfo = new BlockMeta(b, b.getMetaFromState(s));
@@ -704,7 +704,7 @@ public class SoundTickHandler {
 
 						if (rayTrace != null) {
 							// Check for custom occlusion blocks
-							BlockMeta blockInfo = new BlockMeta(block, 16);
+							BlockMeta blockInfo = new BlockMeta(block, SoundFiltersMod.ALL_METAS);
 
 							if (!SoundFiltersMod.customOcclusion.containsKey(blockInfo)) {
 								blockInfo = new BlockMeta(block, meta);
