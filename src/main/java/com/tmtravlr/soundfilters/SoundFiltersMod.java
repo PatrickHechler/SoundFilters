@@ -190,8 +190,13 @@ public class SoundFiltersMod {
 				int lastDashIndex = occlusionInfo.lastIndexOf('-');
 				int firstDashIndex = occlusionInfo.substring(0, lastDashIndex).lastIndexOf('-');
 				blockName = occlusionInfo.substring(0, firstDashIndex);
-				meta = Integer.valueOf(occlusionInfo.substring(firstDashIndex + 1, lastDashIndex)).intValue();
-				strength = Double.valueOf(occlusionInfo.substring(lastDashIndex + 1)).doubleValue();
+				String metaStr = occlusionInfo.substring(firstDashIndex + 1, lastDashIndex);
+				if ("*".equals(metaStr)) {
+					meta = -1;//(future) magical value for all
+				} else {
+					meta = Integer.parseInt(metaStr);
+				}
+				strength = Double.parseDouble(occlusionInfo.substring(lastDashIndex + 1));
 				block = Block.getBlockFromName(blockName);
 			} catch (Exception e) {
 				logger.error("Error while loading in custom occlusion entry!" + (blockName == "" ? "" : " Block ID was " + blockName), e);
@@ -215,8 +220,13 @@ public class SoundFiltersMod {
 				int lastDashIndex = reverbInfo.lastIndexOf('-');
 				int firstDashIndex = reverbInfo.substring(0, lastDashIndex).lastIndexOf('-');
 				blockName = reverbInfo.substring(0, firstDashIndex);
-				meta = Integer.valueOf(reverbInfo.substring(firstDashIndex + 1, lastDashIndex)).intValue();
-				strength = Double.valueOf(reverbInfo.substring(lastDashIndex + 1)).doubleValue();
+				String metaStr = reverbInfo.substring(firstDashIndex + 1, lastDashIndex);
+				if ("*".equals(metaStr)) {
+					meta = -1;//(future) magical value for all
+				} else {
+					meta = Integer.parseInt(metaStr);
+				}
+				strength = Double.parseDouble(reverbInfo.substring(lastDashIndex + 1));
 				block = Block.getBlockFromName(blockName);
 			} catch (Exception e) {
 				logger.error("Error while loading in custom reverb entry!" + (blockName == "" ? "" : " Block ID was " + blockName), e);
