@@ -42,6 +42,8 @@ public class SoundFiltersMod {
 
 	public static Logger logger;
 
+	public static Configuration config;
+
 	public static int profileSize = 1024;
 	public static boolean doSkyChecks = true;
 	public static boolean doReverb = true;
@@ -131,8 +133,6 @@ public class SoundFiltersMod {
 			return builder.toString();
 		}
 	}
-
-	public static Configuration config;
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
