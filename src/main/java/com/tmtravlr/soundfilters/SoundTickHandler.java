@@ -672,7 +672,7 @@ public class SoundTickHandler {
 					int meta = block.getMetaFromState(state);
 					Material material = state.getMaterial();
 
-					if (block != null && block != Blocks.AIR && state.getBoundingBox(world, new BlockPos(soundX, soundY, soundZ)) != Block.NULL_AABB && block.canCollideCheck(state, false)) {
+					if (block != null && block != Blocks.AIR && state.getBoundingBox(world, pos) != Block.NULL_AABB && block.canCollideCheck(state, false)) {
 						RayTraceResult rayTrace = state.collisionRayTrace(world, pos, sound, listener);
 
 						if (rayTrace != null) {
