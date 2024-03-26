@@ -27,7 +27,8 @@ import paulscode.sound.SoundSystemException;
  * @author Tmtravlr (Rebeca Rey)
  * @Date 2014
  */
-@Mod(modid = SoundFiltersMod.MOD_ID, name = SoundFiltersMod.MOD_NAME, version = SoundFiltersMod.MOD_VERSION, clientSideOnly = true)
+@Mod(modid = SoundFiltersMod.MOD_ID, name = SoundFiltersMod.MOD_NAME, version = SoundFiltersMod.MOD_VERSION, 
+	clientSideOnly = true, guiFactory = "com.tmtravlr.soundfilters.ConfigGUIFactory")
 public class SoundFiltersMod {
 	public static final String MOD_ID = "soundfilters";
 	public static final String MOD_NAME = "Sound Filters";
@@ -140,9 +141,13 @@ public class SoundFiltersMod {
 
 		config.load();
 	}
-
+	
 	//called as late as possible to give other mods time to register their blocks
-    private void configure() {
+    public static void configure() {
+    	if (!config.hasChanged()) {
+    		config.load();
+    	}
+
 		DEBUG = config.getBoolean("Debug", "debug", false, "Set to true to write simple debug info to the console.");
 		SUPER_DUPER_DEBUG = config.getBoolean("High Output Debug", "debug", false,
 				"You probably don't want to set this to true\n"
@@ -233,12 +238,9 @@ public class SoundFiltersMod {
 		if (config.hasChanged()) {
 			config.save();
 		}
-
-		proxy.registerTickHandlers();
-		proxy.registerEventHandlers();
 	}
 
-	private String[] parseCustomBlockList(String[] blocksList, Map<BlockMeta,Double> customMap, String name, boolean convert) {
+	private static String[] parseCustomBlockList(String[] blocksList, Map<BlockMeta,Double> customMap, String name, boolean convert) {
 		boolean legacyAnyMeta = legacyAnyMeta();
 		boolean replace = false;
 		for (int i = 0; i < blocksList.length; i++) {
@@ -296,7 +298,7 @@ public class SoundFiltersMod {
 		return null;
 	}
 
-	private boolean legacyAnyMeta() {
+	private static boolean legacyAnyMeta() {
 		return config.getBoolean("Legacy Meta 16 Value", "debug", false,
 		"if set to true the special meta value * will be invalid and\n"
 		+ "the meta value " + LEGACY_ALL_METAS + " will instead be converted to any meta\n"
@@ -307,6 +309,9 @@ public class SoundFiltersMod {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		configure();
+		proxy.registerTickHandlers();
+		proxy.registerEventHandlers();
+		
 		reverbFilter.density = 0.0F;
 		reverbFilter.diffusion = 0.6F;
 		reverbFilter.gain = 0.15F;

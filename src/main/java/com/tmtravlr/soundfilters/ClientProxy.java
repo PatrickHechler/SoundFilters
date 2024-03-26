@@ -8,13 +8,17 @@ import net.minecraftforge.common.MinecraftForge;
  */
 public class ClientProxy extends CommonProxy
 {
-    public void registerTickHandlers()
+    @Override
+	public void registerTickHandlers()
     {
     	MinecraftForge.EVENT_BUS.register(new SoundTickHandler());
+    	super.registerTickHandlers();
     }
 
-    public void registerEventHandlers()
+    @Override
+	public void registerEventHandlers()
     {
         MinecraftForge.EVENT_BUS.register(new SoundEventHandler());
+        super.registerEventHandlers();
     }
 }
