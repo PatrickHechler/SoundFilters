@@ -10,5 +10,7 @@ Currently this fork adds two things:
         + by default the old format is converted on the first start
     + the configuration file is now loaded during the post-init stage
         + this makes it possible to reference blocks registered by other mods (usually blocks are registered in the init (or even pre-init) stage)
+    + the search order is swapped, now the mod searches first for the specific meta value and then for the generic one
+        + this allows to easily catch almost all blocks with the same block id
 + graphical configuration page
     + this allows to configure the mod without the need to restart the client
