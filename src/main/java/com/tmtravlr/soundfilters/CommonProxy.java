@@ -1,7 +1,5 @@
 package com.tmtravlr.soundfilters;
 
-import net.minecraftforge.common.MinecraftForge;
-
 /**
  * 
  * @author Rebeca Rey
@@ -11,7 +9,6 @@ public class CommonProxy
 {
     public void registerTickHandlers() {}
 
-    public void registerEventHandlers() {
-        MinecraftForge.EVENT_BUS.register(new ConfigEventHandler());
-    }
+    public void registerEventHandlers() {}
+    
 }
