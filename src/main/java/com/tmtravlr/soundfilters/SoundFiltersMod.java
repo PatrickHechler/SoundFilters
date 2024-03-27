@@ -32,7 +32,7 @@ import paulscode.sound.SoundSystemException;
 public class SoundFiltersMod {
 	public static final String MOD_ID = "soundfilters";
 	public static final String MOD_NAME = "Sound Filters";
-	public static final String MOD_VERSION = "@VERSION@";
+	public static final String MOD_VERSION = "0.13.0_for_1.12";//THIS LINE IS AUTOMATICALLY GENERATED
 
 	@Instance("soundfilters")
 	public static SoundFiltersMod soundFilters;
@@ -139,9 +139,11 @@ public class SoundFiltersMod {
 		logger = event.getModLog();
 		config = new Configuration(event.getSuggestedConfigurationFile());
 
-		config.load();
+		configure();
+		proxy.registerTickHandlers();
+		proxy.registerEventHandlers();
 	}
-	
+
 	//called as late as possible to give other mods time to register their blocks
     public static void configure() {
     	if (!config.hasChanged()) {
@@ -171,7 +173,8 @@ public class SoundFiltersMod {
 				"The percentage of occlusion you can get. You can lower this if you find\n"
 				+ "the occlusion to be too much or raise it for a more noticeable\n"
 				+ "effect.");
-		String[] occlusionBlocksList = config.getStringList("Specific block occlusion:", "occlusion", new String[] { "wool-" + ALL_METAS_STR + "-2.0" },
+		String[] occlusionBlocksList = config.getStringList("Specific block occlusion:", "occlusion", 
+			new String[] { "wool-" + ALL_METAS_STR + "-2.0", "securitycraft:reinforced_wool-" + ALL_METAS_STR + "-1.5" },
 				"Add new entries (each on a new line) in the format\n"
 				+ "<block id>-<metadata>-<occlusion double> to customize how much sound\n"
 				+ "they should absorb when they are between you and the sound source.\n"
@@ -309,8 +312,6 @@ public class SoundFiltersMod {
 	@EventHandler
 	public void postInit(FMLPostInitializationEvent event) {
 		configure();
-		proxy.registerTickHandlers();
-		proxy.registerEventHandlers();
 		
 		reverbFilter.density = 0.0F;
 		reverbFilter.diffusion = 0.6F;

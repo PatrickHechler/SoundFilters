@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+VERSION="$(grep -E '^version=' gradle.properties | sed -E -e 's#^version=(.+)$#\1#')"
+echo "VERSION=$VERSION"
+if test " $1" = " "; then echo 'ERROR: mod version not found'; exit 1; fi
+sed --in-place -E -e \
+  's#^(\s*public\s+static\s+final\s+String\s+MOD_VERSION)\s*=\s*"([^"]|\.)*"\s*;\s*//\s*(THIS LINE IS AUTOMATICALLY GENERATED)\s*$#\1 = "'"$VERSION"'";//\3#'\
+  src/main/java/com/tmtravlr/soundfilters/SoundFiltersMod.java
+if test " $1" = " no-gradlew"; then exit; fi
+exec ./gradlew "$@"
