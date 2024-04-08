@@ -2,9 +2,15 @@
 set -e
 VERSION="$(grep -E '^version=' gradle.properties | sed -E -e 's#^version=(.+)$#\1#')"
 echo "VERSION=$VERSION"
-if test " $1" = " "; then echo 'ERROR: mod version not found'; exit 1; fi
+if test " $(echo "$VERSION" | sed -E -e 's#.*,.*#ERR#')" = " ERR"; then echo "INVALID VERSION: $VERSION"; exit 1; fi
+if test " $VERSION" = " "; then echo 'ERROR: mod version not found'; exit 1; fi
+
 sed --in-place -E -e \
-  's#^(\s*public\s+static\s+final\s+String\s+MOD_VERSION)\s*=\s*"([^"]|\.)*"\s*;\s*//\s*(THIS LINE IS AUTOMATICALLY GENERATED)\s*$#\1 = "'"$VERSION"'";//\3#'\
+  's#^(\s*public\s+static\s+final\s+String\s+MOD_VERSION)\s*=\s*"([^"]|\.)*"\s*;(\s*//\s*THIS LINE IS AUTOMATICALLY GENERATED)\s*$#\1 = "'"$VERSION"'";\3#' \
   src/main/java/com/tmtravlr/soundfilters/SoundFiltersMod.java
+#  "version": "${version}",
+sed --in-place -E -e \
+  's;^(\s*"version":\s*)"[^"]*"(\s*,\s*#\s*THIS LINE IS AUTOMATICALLY GENERATED)\s*$;\1"'"$VERSION"'"\2;' \
+  src/main/resources/mcmod.info
 if test " $1" = " no-gradlew"; then exit; fi
 exec ./gradlew "$@"

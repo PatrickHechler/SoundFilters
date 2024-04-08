@@ -18,7 +18,8 @@ public class FilterReverb extends BaseFilter
     public float roomRolloffFactor = 0.0F;
     public int decayHFLimit = 1;
 
-    public void loadFilter()
+    @Override
+	public void loadFilter()
     {
         if (!this.isLoaded)
         {
@@ -28,7 +29,8 @@ public class FilterReverb extends BaseFilter
         }
     }
 
-    public void checkParameters()
+    @Override
+	public void checkParameters()
     {
         if (this.density < 0.0F)
         {
@@ -161,7 +163,8 @@ public class FilterReverb extends BaseFilter
         }
     }
 
-    public void loadParameters()
+    @Override
+	public void loadParameters()
     {
         this.checkParameters();
 

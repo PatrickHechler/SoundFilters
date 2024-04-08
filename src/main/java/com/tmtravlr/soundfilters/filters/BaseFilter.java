@@ -18,11 +18,6 @@ public abstract class BaseFilter
 
     public abstract void loadParameters();
 
-    private static int safeID(BaseFilter filter)
-    {
-        return filter != null && filter.isEnabled && filter.id != -1 ? filter.id : 0;
-    }
-
     private static int safeSlot(BaseFilter filter)
     {
         return filter != null && filter.isEnabled && filter.slot != -1 ? filter.slot : 0;

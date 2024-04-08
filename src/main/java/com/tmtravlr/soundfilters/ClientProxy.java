@@ -4,6 +4,7 @@ import net.minecraftforge.common.MinecraftForge;
 /**
  * 
  * @author Rebeca Rey
+ * @author Patrick Hechler
  * @Date 2014
  */
 public class ClientProxy extends CommonProxy

@@ -7,7 +7,8 @@ public class FilterLowPass extends BaseFilter
     public float gain = 1.0F;
     public float gainHF = 1.0F;
 
-    public void loadFilter()
+    @Override
+	public void loadFilter()
     {
         if (!this.isLoaded)
         {
@@ -18,7 +19,8 @@ public class FilterLowPass extends BaseFilter
         }
     }
 
-    public void checkParameters()
+    @Override
+	public void checkParameters()
     {
         if (this.gain < 0.0F)
         {
@@ -41,7 +43,8 @@ public class FilterLowPass extends BaseFilter
         }
     }
 
-    public void loadParameters()
+    @Override
+	public void loadParameters()
     {
         this.checkParameters();
 
