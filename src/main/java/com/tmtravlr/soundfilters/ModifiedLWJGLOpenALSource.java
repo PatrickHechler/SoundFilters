@@ -1,17 +1,14 @@
 package com.tmtravlr.soundfilters;
 
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+
+import javax.sound.sampled.AudioFormat;
+
 import com.tmtravlr.soundfilters.SoundTickHandler.ComparablePosition;
 import com.tmtravlr.soundfilters.SoundTickHandler.DoubleWithTimeout;
 import com.tmtravlr.soundfilters.filters.BaseFilter;
 import com.tmtravlr.soundfilters.filters.FilterException;
-
-import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
-import java.util.Map;
-
-import javax.sound.sampled.AudioFormat;
-
-import org.lwjgl.openal.AL10;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
@@ -128,7 +125,7 @@ public class ModifiedLWJGLOpenALSource extends SourceLWJGLOpenAL {
 				boolean isOccluded = false;
 				DoubleWithTimeout sourceInfo = new DoubleWithTimeout((Source) null, 0.0D, 10);
 
-				if (SoundFiltersMod.doOcclusion && this.position != null) {
+				if (SoundFiltersConfig.doOcclusion && this.position != null) {
 					ComparablePosition sourcePosition = new ComparablePosition(this.position.x, this.position.y, this.position.z);
 					
 					if (SoundTickHandler.sourceOcclusionMap.containsKey(sourcePosition)) {
@@ -146,38 +143,38 @@ public class ModifiedLWJGLOpenALSource extends SourceLWJGLOpenAL {
 					isOccluded = sourceInfo.amount > 0.05D;
 				}
 
-				SoundFiltersMod.lowPassFilter.gain = SoundTickHandler.baseLowPassGain;
-				SoundFiltersMod.lowPassFilter.gainHF = SoundTickHandler.baseLowPassGainHF;
+				SoundFiltersConfig.lowPassFilter.gain = SoundTickHandler.baseLowPassGain;
+				SoundFiltersConfig.lowPassFilter.gainHF = SoundTickHandler.baseLowPassGainHF;
 
 				if (isOccluded && this.attModel != 0) {
-					SoundFiltersMod.lowPassFilter.gain = (float) ((double) SoundFiltersMod.lowPassFilter.gain * (1.0D - 1.0D * sourceInfo.amount));
-					SoundFiltersMod.lowPassFilter.gainHF = (float) ((double) SoundFiltersMod.lowPassFilter.gainHF * (1.0D - 1.0D * (double) MathHelper.sqrt(sourceInfo.amount)));
+					SoundFiltersConfig.lowPassFilter.gain = (float) ((double) SoundFiltersConfig.lowPassFilter.gain * (1.0D - 1.0D * sourceInfo.amount));
+					SoundFiltersConfig.lowPassFilter.gainHF = (float) ((double) SoundFiltersConfig.lowPassFilter.gainHF * (1.0D - 1.0D * (double) MathHelper.sqrt(sourceInfo.amount)));
 				}
 
-				if (SoundFiltersMod.lowPassFilter.gain >= 1.0F && SoundFiltersMod.lowPassFilter.gainHF >= 1.0F) {
-					SoundFiltersMod.lowPassFilter.disable();
+				if (SoundFiltersConfig.lowPassFilter.gain >= 1.0F && SoundFiltersConfig.lowPassFilter.gainHF >= 1.0F) {
+					SoundFiltersConfig.lowPassFilter.disable();
 				} else {
-					SoundFiltersMod.lowPassFilter.enable();
-					SoundFiltersMod.lowPassFilter.loadParameters();
+					SoundFiltersConfig.lowPassFilter.enable();
+					SoundFiltersConfig.lowPassFilter.loadParameters();
 				}
 
-				if (SoundFiltersMod.reverbFilter.reflectionsDelay <= 0.0F && SoundFiltersMod.reverbFilter.lateReverbDelay <= 0.0F) {
-					SoundFiltersMod.reverbFilter.disable();
+				if (SoundFiltersConfig.reverbFilter.reflectionsDelay <= 0.0F && SoundFiltersConfig.reverbFilter.lateReverbDelay <= 0.0F) {
+					SoundFiltersConfig.reverbFilter.disable();
 				} else {
-					SoundFiltersMod.reverbFilter.enable();
-					SoundFiltersMod.reverbFilter.loadParameters();
+					SoundFiltersConfig.reverbFilter.enable();
+					SoundFiltersConfig.reverbFilter.loadParameters();
 				}
 
 				try {
-					BaseFilter.loadSourceFilter(alChannel.ALSource.get(0), 131077, SoundFiltersMod.lowPassFilter);
-					BaseFilter.load3SourceFilters(alChannel.ALSource.get(0), 131078, SoundFiltersMod.reverbFilter, (BaseFilter) null, SoundFiltersMod.lowPassFilter);
+					BaseFilter.loadSourceFilter(alChannel.ALSource.get(0), 131077, SoundFiltersConfig.lowPassFilter);
+					BaseFilter.load3SourceFilters(alChannel.ALSource.get(0), 131078, SoundFiltersConfig.reverbFilter, (BaseFilter) null, SoundFiltersConfig.lowPassFilter);
 				} catch (FilterException e) {
 					CrashReport crashreport = CrashReport.makeCrashReport(e, "Updating Sound Filters");
 					throw new ReportedException(crashreport);
 				}
 			} else {
-				SoundFiltersMod.lowPassFilter.disable();
-				SoundFiltersMod.reverbFilter.disable();
+				SoundFiltersConfig.lowPassFilter.disable();
+				SoundFiltersConfig.reverbFilter.disable();
 
 				try {
 					BaseFilter.loadSourceFilter(alChannel.ALSource.get(0), 131077, (BaseFilter) null);

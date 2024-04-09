@@ -27,7 +27,7 @@ public class ConfigGUIFactory implements IModGuiFactory {
 	@Override
 	public GuiScreen createConfigGui(GuiScreen parentScreen) {
 		List<IConfigElement> confs = new ArrayList<>();
-		Configuration conf = SoundFiltersMod.config;
+		Configuration conf = SoundFiltersConfig.config;
 		for (String name : conf.getCategoryNames()) {
 			confs.add(new ConfigElement(conf.getCategory(name)));
 		}

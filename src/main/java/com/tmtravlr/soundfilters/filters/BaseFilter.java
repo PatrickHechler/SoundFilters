@@ -3,7 +3,7 @@ package com.tmtravlr.soundfilters.filters;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 
-import com.tmtravlr.soundfilters.SoundFiltersMod;
+import com.tmtravlr.soundfilters.SoundFiltersConfig;
 
 public abstract class BaseFilter
 {
@@ -105,7 +105,7 @@ public abstract class BaseFilter
     	int err = AL10.alGetError();
     	
         if (err != 0) {
-        	SoundFiltersMod.logger.error("Caught AL error in '" + location + "'! Error is " + err);
+        	SoundFiltersConfig.logger.error("Caught AL error in '" + location + "'! Error is " + err);
         	return err;
         }
         

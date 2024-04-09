@@ -14,9 +14,9 @@ public class ConfigEventHandler {
 	@SubscribeEvent
 	public void configChangedEventHandler(OnConfigChangedEvent event) {
         if (SoundFiltersMod.MOD_ID.equals(event.getModID())) {
-            SoundFiltersMod.configure();
-            if (SoundFiltersMod.DEBUG) {
-            	SoundFiltersMod.logger.debug("Sound-Filter config changed");
+            SoundFiltersConfig.configure();
+            if (SoundFiltersConfig.DEBUG) {
+            	SoundFiltersConfig.logger.debug("Sound-Filter config changed");
             }
         }
 	}
