@@ -7,8 +7,6 @@ import java.util.Random;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentSkipListMap;
 
-import com.tmtravlr.soundfilters.SoundFiltersMod.BlockMeta;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;

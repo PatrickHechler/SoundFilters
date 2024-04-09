@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.Logger;
 
-import com.tmtravlr.soundfilters.SoundFiltersMod.BlockMeta;
 import com.tmtravlr.soundfilters.filters.FilterLowPass;
 import com.tmtravlr.soundfilters.filters.FilterReverb;
 
