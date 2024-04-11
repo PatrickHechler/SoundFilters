@@ -431,40 +431,32 @@ public class SoundTickHandler {
 						int y = MathHelper.floor(mc.player.posY);
 						int z = MathHelper.floor(mc.player.posZ);
 
-						if (onlySkyAboveBlock(mc.world, x, y, z))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x, y, z + rand.nextInt(5) + 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x, y, z - rand.nextInt(5) - 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z + rand.nextInt(5) + 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z + rand.nextInt(5) + 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z - rand.nextInt(5) - 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z - rand.nextInt(5) - 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x, y + 5, z + rand.nextInt(5) + 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x, y + 5, z - rand.nextInt(5) - 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z + rand.nextInt(5) + 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z + rand.nextInt(5) + 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z - rand.nextInt(5) - 5))
-							skyFactor++;
-						if (onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z - rand.nextInt(5) - 5))
-							skyFactor++;
+						skyFactor += onlySkyAboveBlock(mc.world, x, y, z);
+						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z);
+						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z);
+						skyFactor += onlySkyAboveBlock(mc.world, x, y, z + rand.nextInt(8) - 4);
+						skyFactor += onlySkyAboveBlock(mc.world, x, y, z + rand.nextInt(8) - 4);
+						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
+						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
+						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
+						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
+
+//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z);
+//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z);
+//						skyFactor += onlySkyAboveBlock(mc.world, x, y, z + rand.nextInt(5) + 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x, y, z - rand.nextInt(5) - 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z + rand.nextInt(5) + 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z + rand.nextInt(5) + 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z - rand.nextInt(5) - 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z - rand.nextInt(5) - 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z);
+//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z);
+//						skyFactor += onlySkyAboveBlock(mc.world, x, y + 5, z + rand.nextInt(5) + 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x, y + 5, z - rand.nextInt(5) - 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z + rand.nextInt(5) + 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z + rand.nextInt(5) + 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z - rand.nextInt(5) - 5);
+//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z - rand.nextInt(5) - 5);
 					}
 
 					skyFactor = 1.0F - Math.min(skyFactor, 12F) / 12F;
@@ -512,16 +504,20 @@ public class SoundTickHandler {
 		}
 	}
 
-	private static boolean onlySkyAboveBlock(World world, int x, int y, int z) {
+	private static float onlySkyAboveBlock(World world, int x, int y, int z) {
+		int result = 20;
 		for (int i = y; i < 256; i++) {
 			IBlockState state = world.getBlockState(new BlockPos(x, i, z));
 
 			if (state.getMaterial().blocksMovement()) {
-				return false;
+				if (Material.LEAVES.equals(state.getMaterial()) && --result != 0) { 
+					continue;
+				}
+				return 0f;
 			}
 		}
 
-		return true;
+		return result * 0.1f;
 	}
 
 	/**

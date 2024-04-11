@@ -63,7 +63,7 @@ public class SoundFiltersMod {
 	public void postInit(FMLPostInitializationEvent event) {
 		//called as late as possible to give other mods time to register their blocks
 		configure();
-		
+
 		REVERB_FILTER.density = 0.0F;
 		REVERB_FILTER.diffusion = 0.6F;
 		REVERB_FILTER.gain = 0.15F;

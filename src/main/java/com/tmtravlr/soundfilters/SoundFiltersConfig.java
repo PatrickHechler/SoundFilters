@@ -46,15 +46,19 @@ public class SoundFiltersConfig {
 			+ "0: do not convert\n"                                                                  //
 			+ "1, 2: convert\n"                                                                      //
 			+ "1: after convert: set this value to 0 (do one initial convert)\n"                     //
-			+ "2: do not change this value (I don't know why you could want to use this value)";
-	private static int          CONVERT_LEGACY_META   = 1;
+			+ "2: do not change this value (I don't know why you could want to use this value)"      //
+			+ "the value of this option will be ignored if:\n"                                       //
+			+ "  'Legacy Meta 16 Value' is set to true";
+	private static int          CONVERT_LEGACY_META   = 0;
 	
 	private static final String N_USE_LEGACY_META = "Legacy Meta 16 Value";
-	private static final String C_USE_LEGACY_META =                                               //
-		/*	*/"if set to true the special meta value * will be invalid and\n"                     //
-			+ "the meta value " + LEGACY_ALL_METAS + " will instead be converted to any meta\n"   //
-			+ "if set to true the values will not be converted to the new meta format\n"          //
-			+ "  ('Convert legacy Meta 16' will be ignored)";
+	private static final String C_USE_LEGACY_META =                                                //
+		/*	*/"if set to true the special meta value * will be invalid and\n"                      //
+			+ "the meta value " + LEGACY_ALL_METAS + " will instead be converted to any meta\n"    //
+			+ "if set to true the following settings will be ignored\n"                            //
+			+ "  'Convert legacy Meta 16' will be treated like zero\n"                             //
+			+ "  'Legacy Custom List' will be treated like true\n"                                 //
+			+ "this restores compatibility of the custom occlusion/reverb lists (0.12 and before)";
 	private static boolean      USE_LEGACY_META   = false;
 	
 	
@@ -173,15 +177,16 @@ public class SoundFiltersConfig {
 		DEBUG = config.getBoolean(N_DEBUG, S_DEBUG, false, C_DEBUG);
 		SUPER_DUPER_DEBUG = config.getBoolean(N_SUPER_DUPER_DEBUG, S_DEBUG, false, C_SUPER_DUPER_DEBUG);
 		USE_LEGACY_META = config.getBoolean(N_USE_LEGACY_META, S_DEBUG, false, C_USE_LEGACY_META);
-		CONVERT_LEGACY_META = config.getInt(N_CONVERT_LEGACY_META, S_DEBUG, 1, 0, 2, C_CONVERT_LEGACY_META);
-		if ( USE_LEGACY_META ) CONVERT_LEGACY_META = 0;
-		else if ( CONVERT_LEGACY_META == 1 ) {
+		CONVERT_LEGACY_META = config.getInt(N_CONVERT_LEGACY_META, S_DEBUG, 0, 0, 2, C_CONVERT_LEGACY_META);
+		if ( USE_LEGACY_META ) {
+			CONVERT_LEGACY_META = 0;
+		} else if ( CONVERT_LEGACY_META == 1 ) {
 			ConfigCategory cat = config.getCategory(S_DEBUG);
 			Property prop = cat.get(N_CONVERT_LEGACY_META);
 			prop.set(0);
 		}
-		config.getCategory(S_DEBUG)
-			.setPropertyOrder(Arrays.asList(N_DEBUG, N_SUPER_DUPER_DEBUG, N_USE_LEGACY_META, N_CONVERT_LEGACY_META));
+		config.getCategory(S_DEBUG).setPropertyOrder(Arrays.asList(N_DEBUG, N_SUPER_DUPER_DEBUG, //
+			N_USE_LEGACY_META, N_CONVERT_LEGACY_META));
 		
 		// S_LOW_PASS
 		DO_LOW_PASS = config.getBoolean(N_DO_LOW_PASS, S_LOW_PASS, true, C_DO_LOW_PASS);
@@ -194,7 +199,9 @@ public class SoundFiltersConfig {
 		DO_OCCLUSION = config.getBoolean(N_DO_OCCLUSION, S_OCCLUSION, true, C_DO_OCCLUSION);
 		OCCLUSION_PERCENT = config.getFloat(N_OCCLUSION_PERCENT, S_OCCLUSION, 1.0f, 0.0f, Float.POSITIVE_INFINITY,
 			C_OCCLUSION_PERCENT);
-		customBlockList(N_CUSTOM_OCCLUSION, S_OCCLUSION, C_CUSTOM_OCCLUSION, CUSTOM_OCCLUSION, "wool-" + ALL_METAS_STR + "-2.0",
+		customBlockList(N_CUSTOM_OCCLUSION, S_OCCLUSION, C_CUSTOM_OCCLUSION, CUSTOM_OCCLUSION, //
+			"wool-" + ALL_METAS_STR + "-2.0", //
+			"minecraft:sponge-" + ALL_METAS_STR + "-2.0", //
 			"securitycraft:reinforced_wool-" + ALL_METAS_STR + "-1.5");
 		
 		// S_REVERB
@@ -218,7 +225,7 @@ public class SoundFiltersConfig {
 	private static void customBlockList(String name, String section, String comment, Map<BlockMeta,Double> targetMap,
 		String... defaultValues) {
 		String[] resultList = config.getStringList(name, section, defaultValues, comment);
-		resultList = parseCustomBlockList(resultList, targetMap, section, CONVERT_LEGACY_META > 0);
+		resultList = parseCustomBlockList(resultList, targetMap, section);
 		if ( resultList != null ) {
 			ConfigCategory cat = config.getCategory(section);
 			Property prop = cat.get(name);
@@ -226,8 +233,7 @@ public class SoundFiltersConfig {
 		}
 	}
 	
-	private static String[] parseCustomBlockList(String[] blocksList, Map<BlockMeta,Double> customMap, String name,
-		boolean convert) {
+	private static String[] parseCustomBlockList(String[] blocksList, Map<BlockMeta,Double> customMap, String name) {
 		boolean replace = false;
 		customMap.clear();
 		for (int i = 0; i < blocksList.length; i++) {
@@ -256,8 +262,8 @@ public class SoundFiltersConfig {
 					if ( meta < 0 ) {
 						throw new NumberFormatException("only non-negative values are permitted");
 					}
-					if ( convert && meta == LEGACY_ALL_METAS ) {
-						meta = LEGACY_ALL_METAS;
+					if ( CONVERT_LEGACY_META > 0 && meta == LEGACY_ALL_METAS ) {
+						meta = ALL_METAS;
 						replace = true;
 						blocksList[i] = customInfo.substring(0, secondLastDashIndex) + "-*" + customInfo.substring(lastDashIndex);
 					}
