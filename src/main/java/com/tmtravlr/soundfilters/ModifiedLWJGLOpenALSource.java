@@ -125,7 +125,7 @@ public class ModifiedLWJGLOpenALSource extends SourceLWJGLOpenAL {
 				boolean isOccluded = false;
 				DoubleWithTimeout sourceInfo = new DoubleWithTimeout((Source) null, 0.0D, 10);
 
-				if (SoundFiltersConfig.doOcclusion && this.position != null) {
+				if (SoundFiltersConfig.DO_OCCLUSION && this.position != null) {
 					ComparablePosition sourcePosition = new ComparablePosition(this.position.x, this.position.y, this.position.z);
 					
 					if (SoundTickHandler.sourceOcclusionMap.containsKey(sourcePosition)) {
@@ -143,38 +143,38 @@ public class ModifiedLWJGLOpenALSource extends SourceLWJGLOpenAL {
 					isOccluded = sourceInfo.amount > 0.05D;
 				}
 
-				SoundFiltersConfig.lowPassFilter.gain = SoundTickHandler.baseLowPassGain;
-				SoundFiltersConfig.lowPassFilter.gainHF = SoundTickHandler.baseLowPassGainHF;
+				SoundFiltersConfig.LOW_PASS_FILTER.gain = SoundTickHandler.baseLowPassGain;
+				SoundFiltersConfig.LOW_PASS_FILTER.gainHF = SoundTickHandler.baseLowPassGainHF;
 
 				if (isOccluded && this.attModel != 0) {
-					SoundFiltersConfig.lowPassFilter.gain = (float) ((double) SoundFiltersConfig.lowPassFilter.gain * (1.0D - 1.0D * sourceInfo.amount));
-					SoundFiltersConfig.lowPassFilter.gainHF = (float) ((double) SoundFiltersConfig.lowPassFilter.gainHF * (1.0D - 1.0D * (double) MathHelper.sqrt(sourceInfo.amount)));
+					SoundFiltersConfig.LOW_PASS_FILTER.gain = (float) ((double) SoundFiltersConfig.LOW_PASS_FILTER.gain * (1.0D - 1.0D * sourceInfo.amount));
+					SoundFiltersConfig.LOW_PASS_FILTER.gainHF = (float) ((double) SoundFiltersConfig.LOW_PASS_FILTER.gainHF * (1.0D - 1.0D * (double) MathHelper.sqrt(sourceInfo.amount)));
 				}
 
-				if (SoundFiltersConfig.lowPassFilter.gain >= 1.0F && SoundFiltersConfig.lowPassFilter.gainHF >= 1.0F) {
-					SoundFiltersConfig.lowPassFilter.disable();
+				if (SoundFiltersConfig.LOW_PASS_FILTER.gain >= 1.0F && SoundFiltersConfig.LOW_PASS_FILTER.gainHF >= 1.0F) {
+					SoundFiltersConfig.LOW_PASS_FILTER.disable();
 				} else {
-					SoundFiltersConfig.lowPassFilter.enable();
-					SoundFiltersConfig.lowPassFilter.loadParameters();
+					SoundFiltersConfig.LOW_PASS_FILTER.enable();
+					SoundFiltersConfig.LOW_PASS_FILTER.loadParameters();
 				}
 
-				if (SoundFiltersConfig.reverbFilter.reflectionsDelay <= 0.0F && SoundFiltersConfig.reverbFilter.lateReverbDelay <= 0.0F) {
-					SoundFiltersConfig.reverbFilter.disable();
+				if (SoundFiltersConfig.REVERB_FILTER.reflectionsDelay <= 0.0F && SoundFiltersConfig.REVERB_FILTER.lateReverbDelay <= 0.0F) {
+					SoundFiltersConfig.REVERB_FILTER.disable();
 				} else {
-					SoundFiltersConfig.reverbFilter.enable();
-					SoundFiltersConfig.reverbFilter.loadParameters();
+					SoundFiltersConfig.REVERB_FILTER.enable();
+					SoundFiltersConfig.REVERB_FILTER.loadParameters();
 				}
 
 				try {
-					BaseFilter.loadSourceFilter(alChannel.ALSource.get(0), 131077, SoundFiltersConfig.lowPassFilter);
-					BaseFilter.load3SourceFilters(alChannel.ALSource.get(0), 131078, SoundFiltersConfig.reverbFilter, (BaseFilter) null, SoundFiltersConfig.lowPassFilter);
+					BaseFilter.loadSourceFilter(alChannel.ALSource.get(0), 131077, SoundFiltersConfig.LOW_PASS_FILTER);
+					BaseFilter.load3SourceFilters(alChannel.ALSource.get(0), 131078, SoundFiltersConfig.REVERB_FILTER, (BaseFilter) null, SoundFiltersConfig.LOW_PASS_FILTER);
 				} catch (FilterException e) {
 					CrashReport crashreport = CrashReport.makeCrashReport(e, "Updating Sound Filters");
 					throw new ReportedException(crashreport);
 				}
 			} else {
-				SoundFiltersConfig.lowPassFilter.disable();
-				SoundFiltersConfig.reverbFilter.disable();
+				SoundFiltersConfig.LOW_PASS_FILTER.disable();
+				SoundFiltersConfig.REVERB_FILTER.disable();
 
 				try {
 					BaseFilter.loadSourceFilter(alChannel.ALSource.get(0), 131077, (BaseFilter) null);

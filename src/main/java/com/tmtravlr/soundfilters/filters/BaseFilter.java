@@ -105,7 +105,7 @@ public abstract class BaseFilter
     	int err = AL10.alGetError();
     	
         if (err != 0) {
-        	SoundFiltersConfig.logger.error("Caught AL error in '" + location + "'! Error is " + err);
+        	SoundFiltersConfig.LOGGER.error("Caught AL error in '" + location + "'! Error is " + err);
         	return err;
         }
         

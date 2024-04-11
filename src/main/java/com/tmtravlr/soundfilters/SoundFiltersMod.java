@@ -1,11 +1,11 @@
 package com.tmtravlr.soundfilters;
 
-import static com.tmtravlr.soundfilters.SoundFiltersConfig.config;
+import static com.tmtravlr.soundfilters.SoundFiltersConfig.LOGGER;
+import static com.tmtravlr.soundfilters.SoundFiltersConfig.REVERB_FILTER;
 import static com.tmtravlr.soundfilters.SoundFiltersConfig.configure;
-import static com.tmtravlr.soundfilters.SoundFiltersConfig.logger;
-import static com.tmtravlr.soundfilters.SoundFiltersConfig.reverbFilter;
 
-import net.minecraftforge.common.config.Configuration;
+import java.io.File;
+
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -51,10 +51,10 @@ public class SoundFiltersMod {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		logger = event.getModLog();
-		config = new Configuration(event.getSuggestedConfigurationFile());
-
-		configure();
+		LOGGER = event.getModLog();
+		
+		File confFile = event.getSuggestedConfigurationFile();
+		configure(confFile == null ? new File("soundfilters.conf") : confFile);
 		proxy.registerTickHandlers();
 		proxy.registerEventHandlers();
 	}
@@ -64,18 +64,18 @@ public class SoundFiltersMod {
 		//called as late as possible to give other mods time to register their blocks
 		configure();
 		
-		reverbFilter.density = 0.0F;
-		reverbFilter.diffusion = 0.6F;
-		reverbFilter.gain = 0.15F;
-		reverbFilter.gainHF = 0.8F;
-		reverbFilter.decayTime = 0.1F;
-		reverbFilter.decayHFRatio = 0.7F;
-		reverbFilter.reflectionsGain = 0.6F;
-		reverbFilter.reflectionsDelay = 0.0F;
-		reverbFilter.lateReverbGain = 0.9F;
-		reverbFilter.lateReverbDelay = 0.0F;
-		reverbFilter.airAbsorptionGainHF = 0.99F;
-		reverbFilter.roomRolloffFactor = 0.0F;
+		REVERB_FILTER.density = 0.0F;
+		REVERB_FILTER.diffusion = 0.6F;
+		REVERB_FILTER.gain = 0.15F;
+		REVERB_FILTER.gainHF = 0.8F;
+		REVERB_FILTER.decayTime = 0.1F;
+		REVERB_FILTER.decayHFRatio = 0.7F;
+		REVERB_FILTER.reflectionsGain = 0.6F;
+		REVERB_FILTER.reflectionsDelay = 0.0F;
+		REVERB_FILTER.lateReverbGain = 0.9F;
+		REVERB_FILTER.lateReverbDelay = 0.0F;
+		REVERB_FILTER.airAbsorptionGainHF = 0.99F;
+		REVERB_FILTER.roomRolloffFactor = 0.0F;
 	}
 
 }

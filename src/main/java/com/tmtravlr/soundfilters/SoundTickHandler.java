@@ -145,17 +145,17 @@ public class SoundTickHandler {
 				if (this.mc.player.isInsideOfMaterial(Material.WATER)) {
 					if (!waterSound) {
 						if (SoundFiltersConfig.DEBUG) {
-							SoundFiltersConfig.logger.info("[SoundFilters] Applying water sound low pass.");
+							SoundFiltersConfig.LOGGER.info("[SoundFilters] Applying water sound low pass.");
 						}
 
-						targetLowPassGain = SoundFiltersConfig.waterVolume;
-						targetLowPassGainHF = SoundFiltersConfig.waterLowPassAmount;
+						targetLowPassGain = SoundFiltersConfig.WATER_VOLUME;
+						targetLowPassGainHF = SoundFiltersConfig.WATER_LOW_PASS_AMOUNT;
 						lavaSound = false;
 						waterSound = true;
 					}
 				} else if (waterSound) {
 					if (SoundFiltersConfig.DEBUG) {
-						SoundFiltersConfig.logger.info("[SoundFilters] Stopping water sound low pass.");
+						SoundFiltersConfig.LOGGER.info("[SoundFilters] Stopping water sound low pass.");
 					}
 
 					targetLowPassGain = 1.0F;
@@ -166,17 +166,17 @@ public class SoundTickHandler {
 				if (this.mc.player.isInsideOfMaterial(Material.LAVA)) {
 					if (!lavaSound) {
 						if (SoundFiltersConfig.DEBUG) {
-							SoundFiltersConfig.logger.info("[SoundFilters] Applying lava sound low pass.");
+							SoundFiltersConfig.LOGGER.info("[SoundFilters] Applying lava sound low pass.");
 						}
 
-						targetLowPassGain = SoundFiltersConfig.lavaVolume;
-						targetLowPassGainHF = SoundFiltersConfig.lavaLowPassAmount;
+						targetLowPassGain = SoundFiltersConfig.LAVA_VOLUME;
+						targetLowPassGainHF = SoundFiltersConfig.LAVA_LOW_PASS_AMOUNT;
 						lavaSound = true;
 						waterSound = false;
 					}
 				} else if (lavaSound) {
 					if (SoundFiltersConfig.DEBUG) {
-						SoundFiltersConfig.logger.info("[SoundFilters] Stopping lava sound low pass.");
+						SoundFiltersConfig.LOGGER.info("[SoundFilters] Stopping lava sound low pass.");
 					}
 
 					targetLowPassGain = 1.0F;
@@ -196,9 +196,9 @@ public class SoundTickHandler {
 
 				baseLowPassGain = 1.0F;
 				baseLowPassGainHF = 1.0F;
-				SoundFiltersConfig.reverbFilter.decayTime = 0.1F;
-				SoundFiltersConfig.reverbFilter.reflectionsDelay = 0.0F;
-				SoundFiltersConfig.reverbFilter.lateReverbDelay = 0.0F;
+				SoundFiltersConfig.REVERB_FILTER.decayTime = 0.1F;
+				SoundFiltersConfig.REVERB_FILTER.reflectionsDelay = 0.0F;
+				SoundFiltersConfig.REVERB_FILTER.lateReverbDelay = 0.0F;
 				lavaSound = false;
 				waterSound = false;
 			}
@@ -206,7 +206,7 @@ public class SoundTickHandler {
 			ArrayList<ComparablePosition> toRemove = new ArrayList<ComparablePosition>();
 
 			// Calculate sound occlusion for all the sources playing.
-			if (SoundFiltersConfig.doOcclusion) {
+			if (SoundFiltersConfig.DO_OCCLUSION) {
 				for (ComparablePosition sourcePosition : sourceOcclusionMap.keySet()) {
 					DoubleWithTimeout sourceAndAmount = (DoubleWithTimeout) sourceOcclusionMap.get(sourcePosition);
 					if (sourceAndAmount != null) {
@@ -216,13 +216,13 @@ public class SoundTickHandler {
 							try {
 								if (this.mc != null && this.mc.world != null && this.mc.player != null) {
 									Vec3d roomSize = new Vec3d(this.mc.player.posX, this.mc.player.posY + (double) this.mc.player.getEyeHeight(), this.mc.player.posZ);
-										sourceAndAmount.amount = (sourceAndAmount.amount * 3 + SoundFiltersConfig.occlusionPercent * getSoundOcclusion(this.mc.world, new Vec3d((double) sourceAndAmount.source.position.x, (double) sourceAndAmount.source.position.y, (double) sourceAndAmount.source.position.z), roomSize)) / 4.0;
+										sourceAndAmount.amount = (sourceAndAmount.amount * 3 + SoundFiltersConfig.OCCLUSION_PERCENT * getSoundOcclusion(this.mc.world, new Vec3d((double) sourceAndAmount.source.position.x, (double) sourceAndAmount.source.position.y, (double) sourceAndAmount.source.position.z), roomSize)) / 4.0;
 								} else {
 									sourceAndAmount.amount = 0.0D;
 								}
 							} catch (NullPointerException e) {
 								if (SoundFiltersConfig.DEBUG) {
-									SoundFiltersConfig.logger.warn("Caught null pointer exception while updating sound occlusion. This happens sometimes because a sound is modified at the same time in another thread.");
+									SoundFiltersConfig.LOGGER.warn("Caught null pointer exception while updating sound occlusion. This happens sometimes because a sound is modified at the same time in another thread.");
 								}
 							}
 						} else {
@@ -233,13 +233,13 @@ public class SoundTickHandler {
 
 				for (ComparablePosition positionToRemove : toRemove) {
 					if (SoundFiltersConfig.SUPER_DUPER_DEBUG)
-						SoundFiltersConfig.logger.info("[Sound Filters] Removing " + positionToRemove + ", " + positionToRemove.hashCode() + ", " + profileTickCountdown);
+						SoundFiltersConfig.LOGGER.info("[Sound Filters] Removing " + positionToRemove + ", " + positionToRemove.hashCode() + ", " + profileTickCountdown);
 					sourceOcclusionMap.remove(positionToRemove);
 				}
 			}
 
 			// Create a profile of the reverb in the area.
-			if (this.mc != null && this.mc.world != null && this.mc.player != null && SoundFiltersConfig.doReverb) {
+			if (this.mc != null && this.mc.world != null && this.mc.player != null && SoundFiltersConfig.DO_REVERB) {
 				--profileTickCountdown;
 
 				// Only run every 13 ticks.
@@ -258,7 +258,7 @@ public class SoundTickHandler {
 					// maximum size of
 					// SoundFiltersConfig.profileSize (the size in the config file)
 					int i;
-					for (i = 0; i < SoundFiltersConfig.profileSize && !toVisit.isEmpty(); i++) {
+					for (i = 0; i < SoundFiltersConfig.PROFILE_SIZE && !toVisit.isEmpty(); i++) {
 						ComparablePosition current = (ComparablePosition) toVisit.remove(rand.nextInt(toVisit.size()));
 						visited.add(current);
 
@@ -381,7 +381,7 @@ public class SoundTickHandler {
 						Block b = s.getBlock();
 
 						// Check for custom reverb blocks
-						Double value = getCustomValue(b, b.getMetaFromState(s), SoundFiltersConfig.customOcclusion);
+						Double value = getCustomValue(b, b.getMetaFromState(s), SoundFiltersConfig.CUSTOM_OCCLUSION);
 
 						if (value != null) {
 							double factor = value.doubleValue();
@@ -412,7 +412,7 @@ public class SoundTickHandler {
 
 					float skyFactor = 0.0F;
 
-					if (SoundFiltersConfig.doSkyChecks && roomSize == SoundFiltersConfig.profileSize) {
+					if (SoundFiltersConfig.DO_SKY_CHECKS && roomSize == SoundFiltersConfig.PROFILE_SIZE) {
 						/*
 						 * Check if you and blocks around you can see the sky in
 						 * a pattern like so:
@@ -470,7 +470,7 @@ public class SoundTickHandler {
 					skyFactor = 1.0F - Math.min(skyFactor, 12F) / 12F;
 
 					float decayFactor = 0.0F;
-					float roomFactor = (float) roomSize / (float) SoundFiltersConfig.profileSize;
+					float roomFactor = (float) roomSize / (float) SoundFiltersConfig.PROFILE_SIZE;
 
 					if (highReverb + midReverb + lowReverb > 0) {
 						decayFactor += (float) (highReverb - lowReverb) / (float) (highReverb + midReverb + lowReverb);
@@ -485,7 +485,7 @@ public class SoundTickHandler {
 					}
 
 					if (SoundFiltersConfig.SUPER_DUPER_DEBUG) {
-						SoundFiltersConfig.logger.info("[Sound Filters] Reverb Profile - Room Size: " + roomSize + ", Looked at: " + i + ", Sky Factor: " + skyFactor + ", High, Mid, and Low Reverb: ("
+						SoundFiltersConfig.LOGGER.info("[Sound Filters] Reverb Profile - Room Size: " + roomSize + ", Looked at: " + i + ", Sky Factor: " + skyFactor + ", High, Mid, and Low Reverb: ("
 								+ highReverb + ", " + midReverb + ", " + lowReverb + ")");
 					}
 
@@ -497,16 +497,16 @@ public class SoundTickHandler {
 					prevRoomFactor = roomFactor;
 					prevSkyFactor = skyFactor;
 
-					SoundFiltersConfig.reverbFilter.decayTime = SoundFiltersConfig.reverbPercent * 8.0F * decayFactor * roomFactor * skyFactor;
+					SoundFiltersConfig.REVERB_FILTER.decayTime = SoundFiltersConfig.REVERB_PERCENT * 8.0F * decayFactor * roomFactor * skyFactor;
 
-					if (SoundFiltersConfig.reverbFilter.decayTime < 0.1F) {
-						SoundFiltersConfig.reverbFilter.decayTime = 0.1F;
+					if (SoundFiltersConfig.REVERB_FILTER.decayTime < 0.1F) {
+						SoundFiltersConfig.REVERB_FILTER.decayTime = 0.1F;
 					}
 
-					SoundFiltersConfig.reverbFilter.reflectionsGain = SoundFiltersConfig.reverbPercent * (0.05F + (0.05F * roomFactor));
-					SoundFiltersConfig.reverbFilter.reflectionsDelay = 0.025F * roomFactor;
-					SoundFiltersConfig.reverbFilter.lateReverbGain = SoundFiltersConfig.reverbPercent * (1.26F + (0.1F * roomFactor));
-					SoundFiltersConfig.reverbFilter.lateReverbDelay = 0.01F * roomFactor;
+					SoundFiltersConfig.REVERB_FILTER.reflectionsGain = SoundFiltersConfig.REVERB_PERCENT * (0.05F + (0.05F * roomFactor));
+					SoundFiltersConfig.REVERB_FILTER.reflectionsDelay = 0.025F * roomFactor;
+					SoundFiltersConfig.REVERB_FILTER.lateReverbGain = SoundFiltersConfig.REVERB_PERCENT * (1.26F + (0.1F * roomFactor));
+					SoundFiltersConfig.REVERB_FILTER.lateReverbDelay = 0.01F * roomFactor;
 				}
 			}
 		}
@@ -675,7 +675,7 @@ public class SoundTickHandler {
 
 						if (rayTrace != null) {
 							// Check for custom occlusion blocks
-							Double value = getCustomValue(block, meta, SoundFiltersConfig.customOcclusion);
+							Double value = getCustomValue(block, meta, SoundFiltersConfig.CUSTOM_OCCLUSION);
 
 							if (value != null) {
 								occludedPercent += value.doubleValue() * 0.1D;
