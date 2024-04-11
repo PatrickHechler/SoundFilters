@@ -21,13 +21,6 @@ gradlew
 
 # other
 *.bat
-*changelog.txt
-*-fml.txt
 eclipse
 run
-MinecraftForge-Credits.txt
-MinecraftForge-License.txt
-Paulscode IBXM Library License.txt
-Paulscode SoundSystem CodecIBXM License.txt
-README.txt
-LICENSE-new.txt
+*.txt
