@@ -240,12 +240,10 @@ public class SoundTickHandler {
 
 			// Create a profile of the reverb in the area.
 			if (this.mc != null && this.mc.world != null && this.mc.player != null && SoundFiltersConfig.DO_REVERB) {
-				--profileTickCountdown;
-
 				// Only run every 13 ticks.
-				if (profileTickCountdown <= 0) {
+				if (--profileTickCountdown <= 0) {
 					profileTickCountdown = 13;
-
+					
 					Random rand = new Random();
 					TreeSet<ComparablePosition> visited = new TreeSet<ComparablePosition>();
 					ArrayList<IBlockState> blocksFound = new ArrayList<IBlockState>();
@@ -440,23 +438,6 @@ public class SoundTickHandler {
 						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
 						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
 						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(8) - 4, y, z + rand.nextInt(8) - 4);
-
-//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z);
-//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z);
-//						skyFactor += onlySkyAboveBlock(mc.world, x, y, z + rand.nextInt(5) + 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x, y, z - rand.nextInt(5) - 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z + rand.nextInt(5) + 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z + rand.nextInt(5) + 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y, z - rand.nextInt(5) - 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y, z - rand.nextInt(5) - 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z);
-//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z);
-//						skyFactor += onlySkyAboveBlock(mc.world, x, y + 5, z + rand.nextInt(5) + 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x, y + 5, z - rand.nextInt(5) - 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z + rand.nextInt(5) + 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z + rand.nextInt(5) + 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x + rand.nextInt(5) + 5, y + 5, z - rand.nextInt(5) - 5);
-//						skyFactor += onlySkyAboveBlock(mc.world, x - rand.nextInt(5) - 5, y + 5, z - rand.nextInt(5) - 5);
 					}
 
 					skyFactor = 1.0F - Math.min(skyFactor, 12F) / 12F;
@@ -489,15 +470,18 @@ public class SoundTickHandler {
 					prevRoomFactor = roomFactor;
 					prevSkyFactor = skyFactor;
 
-					SoundFiltersConfig.REVERB_FILTER.decayTime = SoundFiltersConfig.REVERB_PERCENT * 8.0F * decayFactor * roomFactor * skyFactor;
+					Float baseValue = SoundFiltersConfig.DIM_REVERB.get(this.mc.player.world.provider.getDimensionType().getName());
+					float base = baseValue != null ? SoundFiltersConfig.REVERB_PERCENT * baseValue.floatValue() : SoundFiltersConfig.REVERB_PERCENT ;
+
+					SoundFiltersConfig.REVERB_FILTER.decayTime = base * 8.0F * decayFactor * roomFactor * skyFactor;
 
 					if (SoundFiltersConfig.REVERB_FILTER.decayTime < 0.1F) {
 						SoundFiltersConfig.REVERB_FILTER.decayTime = 0.1F;
 					}
 
-					SoundFiltersConfig.REVERB_FILTER.reflectionsGain = SoundFiltersConfig.REVERB_PERCENT * (0.05F + (0.05F * roomFactor));
+					SoundFiltersConfig.REVERB_FILTER.reflectionsGain = base * (0.05F + (0.05F * roomFactor));
 					SoundFiltersConfig.REVERB_FILTER.reflectionsDelay = 0.025F * roomFactor;
-					SoundFiltersConfig.REVERB_FILTER.lateReverbGain = SoundFiltersConfig.REVERB_PERCENT * (1.26F + (0.1F * roomFactor));
+					SoundFiltersConfig.REVERB_FILTER.lateReverbGain = base * (1.26F + (0.1F * roomFactor));
 					SoundFiltersConfig.REVERB_FILTER.lateReverbDelay = 0.01F * roomFactor;
 				}
 			}

@@ -85,24 +85,24 @@ public class SoundFiltersConfig {
 	public static float         LAVA_VOLUME   = 0.6f;
 	
 	
-	public static String S_OCCLUSION = "occlusion";
+	private static String S_OCCLUSION = "occlusion";
 	
-	public static String  N_DO_OCCLUSION = "Use Occluded Sounds (muting sounds behind solid walls)?";
-	public static String  C_DO_OCCLUSION =                                                           //
+	private static String  N_DO_OCCLUSION = "Use Occluded Sounds (muting sounds behind solid walls)?";
+	private static String  C_DO_OCCLUSION =                                                           //
 		/*	*/"Set to false to disable low pass filter for sounds behind solid walls.\n"             //
 			+ "If you are getting lag, disabling this might help.";
 	public static boolean DO_OCCLUSION   = true;
 	
-	public static String N_OCCLUSION_PERCENT = "Occlusion Percent";
-	public static String C_OCCLUSION_PERCENT =                     //
+	private static String N_OCCLUSION_PERCENT = "Occlusion Percent";
+	private static String C_OCCLUSION_PERCENT =                     //
 		/*	*/"The percentage of occlusion you can get.\n"         //
 			+ "You can lower this if you find\n"                   //
 			+ "the occlusion to be too much or raise it\n"         //
 			+ "for a more noticeable effect.";
 	public static float  OCCLUSION_PERCENT   = 1.0f;
 	
-	public static String                N_CUSTOM_OCCLUSION = "Specific block occlusion:";
-	public static String                C_CUSTOM_OCCLUSION =                                          //
+	private static String                N_CUSTOM_OCCLUSION = "Specific block occlusion:";
+	private static String                C_CUSTOM_OCCLUSION =                                          //
 		/*	*/"Add new entries (each on a new line) in the format\n"                                  //
 			+ "<block id>-<metadata>-<occlusion double> to customize how much sound\n"                //
 			+ "they should absorb when they are between you and the sound source.\n"                  //
@@ -113,27 +113,27 @@ public class SoundFiltersConfig {
 	public static Map<BlockMeta,Double> CUSTOM_OCCLUSION   = new HashMap<>();
 	
 	
-	public static String S_REVERB = "reverb";
+	private static String S_REVERB = "reverb";
 	
-	public static String  N_DO_REVERB = "Use Reverb?";
-	public static String  C_DO_REVERB = "Set to false to disable reverb.";
+	private static String  N_DO_REVERB = "Use Reverb?";
+	private static String  C_DO_REVERB = "Set to false to disable reverb.";
 	public static boolean DO_REVERB   = true;
 	
-	public static String N_REVERB_PERCENT = "Reverb Percent";
-	public static String C_REVERB_PERCENT =                                              //
+	private static String N_REVERB_PERCENT = "Reverb Percent";
+	private static String C_REVERB_PERCENT =                                              //
 		/*	*/"The percentage of reverb you can get. You can lower this if you find\n"   //
 			+ "the reverb to be too much (or raise it if you really want an\n"           //
 			+ "echo).";
 	public static float  REVERB_PERCENT   = 1.0f;
 	
-	public static String N_PROFILE_SIZE = "Number of blocks reverb will check through:";
-	public static String C_PROFILE_SIZE =                                               //
+	private static String N_PROFILE_SIZE = "Number of blocks reverb will check through:";
+	private static String C_PROFILE_SIZE =                                               //
 		/*	*/"If you are getting lag, set this number lower. The higher it is,\n"      //
 			+ "the more realistic the reverb will be.";
 	public static int    PROFILE_SIZE   = 1024;
 	
-	public static String  N_DO_SKY_CHECKS = "Do sky checks:";
-	public static String  C_DO_SKY_CHECKS =                                             //
+	private static String  N_DO_SKY_CHECKS = "Do sky checks:";
+	private static String  C_DO_SKY_CHECKS =                                             //
 		/*	*/"If this is true, when you're in an area that can see the sky, then\n"    //
 			+ "there will be less reverb. This is for aboveground areas with\n"         //
 			+ "lots of stone and such like extreme hills biomes. There still might\n"   //
@@ -141,9 +141,9 @@ public class SoundFiltersConfig {
 	public static boolean DO_SKY_CHECKS   = true;
 	
 	
-	public static String                N_CUSTOM_REVERB = "Specific block reverb:";
-	public static String                C_CUSTOM_REVERB =                                              //
-		/*	*/"Add values to this list (each on a new line) in the format \n"                          //
+	private static String                N_CUSTOM_REVERB = "Specific block reverb:";
+	private static String                C_CUSTOM_REVERB =                                              //
+		/*	*/"Add values to this list (each on a new line) in the format\n"                           //
 			+ "<block id>-<metadata>-<reverb double>, to change how the block\n"                       //
 			+ "with that metadata absorbs or creates reverb. If the\n"                                 //
 			+ "metadata is " + ALL_METAS_STR + ", that means it will apply to any metadata value.\n"   //
@@ -153,6 +153,14 @@ public class SoundFiltersConfig {
 			+ "So if, say, you wanted to add pumpkins of any metadata to the blocks\n"                 //
 			+ "that create reverb, you would put pumpkin-" + ALL_METAS_STR + "-2.0 on a new line.";
 	public static Map<BlockMeta,Double> CUSTOM_REVERB   = new HashMap<>();
+	
+	private static String             N_DIM_REVERB = "Specific block reverb:";
+	private static String             C_DIM_REVERB =                                              //
+		/*	*/"Add values to this list (each on a new line) in the format\n"                     //
+			+ "<reverb double> <dimension name>, to change the base reverb\n"                    //
+			+ "of the dimension with the given name.\n"                                          //
+			+ "By default the_nether will have a high base reverb and all other dimensions none";
+	public static Map<String,Float> DIM_REVERB   = new HashMap<>();
 	
 	public static Configuration config() {
 		return config;
@@ -210,6 +218,7 @@ public class SoundFiltersConfig {
 		PROFILE_SIZE = config.getInt(N_PROFILE_SIZE, S_REVERB, 1024, 0, Integer.MAX_VALUE, C_PROFILE_SIZE);
 		DO_SKY_CHECKS = config.getBoolean(N_DO_SKY_CHECKS, S_REVERB, true, C_DO_SKY_CHECKS);
 		customBlockList(N_CUSTOM_REVERB, S_REVERB, C_CUSTOM_REVERB, CUSTOM_REVERB, "soul_sand-" + ALL_METAS_STR + "-2.0");
+		customDimensionList(N_DIM_REVERB, S_REVERB, C_DIM_REVERB, DIM_REVERB, "1.0 the_nether");
 		
 		
 		if ( DEBUG ) {
@@ -222,18 +231,49 @@ public class SoundFiltersConfig {
 		}
 	}
 	
-	private static void customBlockList(String name, String section, String comment, Map<BlockMeta,Double> targetMap,
+	private static void customDimensionList(String name, String section, String comment, Map<String,Float> targetMap,
 		String... defaultValues) {
-		String[] resultList = config.getStringList(name, section, defaultValues, comment);
-		resultList = parseCustomBlockList(resultList, targetMap, section);
-		if ( resultList != null ) {
+		String[] values = config.getStringList(name, section, defaultValues, comment);
+		values = parseCustomDimensionList(values, targetMap);
+		if ( values != null ) {
 			ConfigCategory cat = config.getCategory(section);
 			Property prop = cat.get(name);
-			prop.set(resultList);
+			prop.set(values);
 		}
 	}
 	
-	private static String[] parseCustomBlockList(String[] blocksList, Map<BlockMeta,Double> customMap, String name) {
+	private static String[] parseCustomDimensionList(String[] dimList, Map<String,Float> customMap) {
+		customMap.clear();
+		for (int i = 0; i < dimList.length; i++) {
+			String customInfo = dimList[i];
+			if ( customInfo.isEmpty() ) continue;
+			int si = customInfo.indexOf(' ');
+			if ( si == -1 ) {
+				LOGGER.warn("invalid dimension entry: '" + dimList[i] + "' (no space)");
+				continue;
+			}
+			float value = Float.parseFloat(customInfo.substring(0, si).trim());
+			if ( !( value >= 0D ) ) {
+				LOGGER.warn("invalid dimension entry: '" + dimList[i] + "' (negative or NAN value)");
+				continue;
+			}
+			customMap.put(customInfo.substring(si + 1).trim(), Float.valueOf(value));
+		}
+		return null;
+	}
+	
+	private static void customBlockList(String name, String section, String comment, Map<BlockMeta,Double> targetMap,
+		String... defaultValues) {
+		String[] values = config.getStringList(name, section, defaultValues, comment);
+		values = parseCustomBlockList(values, targetMap, section);
+		if ( values != null ) {
+			ConfigCategory cat = config.getCategory(section);
+			Property prop = cat.get(name);
+			prop.set(values);
+		}
+	}
+	
+	private static String[] parseCustomBlockList(String[] blocksList, Map<BlockMeta,Double> customMap, String sectionName) {
 		boolean replace = false;
 		customMap.clear();
 		for (int i = 0; i < blocksList.length; i++) {
@@ -271,7 +311,7 @@ public class SoundFiltersConfig {
 				strength = Double.parseDouble(customInfo.substring(lastDashIndex + 1));
 				block = Block.getBlockFromName(blockName);
 			} catch ( Exception e ) {
-				LOGGER.error("Error while loading in custom " + name + " entry: '" + customInfo + "'", e);
+				LOGGER.error("Error while loading in custom " + sectionName + " entry: '" + customInfo + "'", e);
 			}
 			// meta value can only be negative in two cases:
 			// 1: star value used
@@ -279,7 +319,7 @@ public class SoundFiltersConfig {
 			// in the first case this is ok, in the second case strength/block is also still invalid
 			if ( block != null && strength >= 0 ) {
 				if ( DEBUG ) {
-					LOGGER.debug("Loaded custom " + name + ": block " + blockName + ", with "
+					LOGGER.debug("Loaded custom " + sectionName + ": block " + blockName + ", with "
 						+ ( meta == ALL_METAS ? "any meta" : "meta " + meta ) + ", and amount " + strength);
 				}
 				customMap.put(new BlockMeta(block, meta), strength);
