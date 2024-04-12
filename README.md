@@ -17,10 +17,11 @@ Currently this fork adds two things:
 
 ## back-port: 0.13
 + todo:
-    - Added dimension reverb list, to set default reverb per-dimension (by default the nether has high reverb)
     - Added a lot more control over the reverb filter in the config file, in an advanced section. Play around with it, and see how it sounds!
 + done:
     - Added sponge and wet sponge to the occlusion block list with high occlusion like wool
+    - Added dimension reverb list, to set default reverb per-dimension (by default the nether has high reverb)
+        + I don't know how the value is used TODO: look at this again
 + done differently:
 + skipped:
     - Added block states and nbt to the block reverb/occlusion lists, as well as block tags
