@@ -34,3 +34,6 @@ Currently this fork adds two things:
         + how
     - Improved sound occlusion to check how thick the block is
         + how do you know how thick a block is (parse graphic?)
+
+## back-port: 0.14
+there is nothing to be done, 0.14 was a bugfix which was already back-ported by Tmtravlr.
