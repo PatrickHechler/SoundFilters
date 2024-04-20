@@ -26,7 +26,7 @@ import paulscode.sound.SoundSystemException;
 public class SoundFiltersMod {
 	public static final String MOD_ID = "soundfilters";
 	public static final String MOD_NAME = "Sound Filters";
-	public static final String MOD_VERSION = "0.13.0_for_1.12";//THIS LINE IS AUTOMATICALLY GENERATED
+	public static final String MOD_VERSION = "0.14.0_for_1.12";//THIS LINE IS AUTOMATICALLY GENERATED
 
 	@Instance("soundfilters")
 	public static SoundFiltersMod soundFilters;

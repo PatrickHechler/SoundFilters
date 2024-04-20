@@ -17,13 +17,15 @@ Currently this fork adds two things:
 
 ## back-port: 0.13
 + todo:
-    - Added a lot more control over the reverb filter in the config file, in an advanced section. Play around with it, and see how it sounds!
 + done:
     - Added sponge and wet sponge to the occlusion block list with high occlusion like wool
     - Added dimension reverb list, to set default reverb per-dimension (by default the nether has high reverb)
-        + I don't know how the value is used TODO: look at this again
+        + I don't know how the value is used, but it seems to work
+        + TODO (someone that knows how sound works) : look at this
 + done differently:
 + skipped:
+    - Added a lot more control over the reverb filter in the config file, in an advanced section. Play around with it, and see how it sounds!
+    	+ I don't know how sound stuff works
     - Added block states and nbt to the block reverb/occlusion lists, as well as block tags
         + the class BlockPredicateArgument does not exist in 1.12 (I might look at it later)
     - Improved reverb checks to see if you are on the surface (and should have little to no reverb)
